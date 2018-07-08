@@ -4,7 +4,7 @@ const Sequelize = require('sequelize');
 const router = express.Router();
 const { Op } = Sequelize;
 
-const logger = require('../utils/logs');
+const error = require('../utils/error');
 const { Category } = require('../models');
 
 router.use((req, res, next) => {
@@ -39,11 +39,8 @@ router.post('/add', async (req, res) => {
       .create(Object.assign({ UserId: req.user.id }, req.body));
     res.json(event);
   } catch (err) {
-    logger.error(err);
-    const message = err.name === 'SequelizeUniqueConstraintError'
-      ? 'Category already exist.'
-      : err.message;
-    res.json({ error: message || err.toString() });
+    const errorMessage = error.generateMessage(err, 'Category');
+    res.json({ error: errorMessage || err.toString() });
   }
 });
 
@@ -60,19 +57,17 @@ router.get('/detail/:id', async (req, res) => {
           },
         },
       });
-    if (!category) {
-      res.json({ message: 'Category not found.' });
-    } else {
-      res.json(category);
-    }
+    const message = !category ? { error: 'Category not found.' } : category;
+    res.json(message);
   } catch (err) {
-    res.json({ error: err.message || err.toString() });
+    const errorMessage = error.generateMessage(err, 'Category');
+    res.json({ error: errorMessage || err.toString() });
   }
 });
 
 router.delete('/detail/:id', async (req, res) => {
   try {
-    await Category
+    const category = await Category
       .destroy({
         where: {
           id: {
@@ -83,9 +78,12 @@ router.delete('/detail/:id', async (req, res) => {
           },
         },
       });
-    res.json({ message: 'Successfully deleted' });
+
+    const message = !category ? 'Category not found.' : 'Successfully deleted';
+    res.json({ error: message });
   } catch (err) {
-    res.json({ error: err.message || err.toString() });
+    const errorMessage = error.generateMessage(err, 'Category');
+    res.json({ error: errorMessage || err.toString() });
   }
 });
 
