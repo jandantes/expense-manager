@@ -5,7 +5,7 @@ const router = express.Router();
 const { Op } = Sequelize;
 
 const error = require('../utils/error');
-const { Category } = require('../models');
+const { Expense } = require('../models');
 
 router.use((req, res, next) => {
   if (!req.user || !req.user.isAdmin) {
@@ -17,9 +17,9 @@ router.use((req, res, next) => {
 
 router.get('/', async (req, res) => {
   try {
-    const categories = await Category
+    const expenses = await Expense
       .findAll({
-        attributes: ['id', 'title', 'description'],
+        // attributes: ['id', 'title', 'value'],
         where: {
           UserId: {
             [Op.eq]: req.user.id,
@@ -27,27 +27,27 @@ router.get('/', async (req, res) => {
         },
         order: [['title', 'ASC']],
       });
-    res.json(categories);
+    res.json(expenses);
   } catch (err) {
-    const errorMessage = error.generateMessage(err, 'Category');
+    const errorMessage = error.generateMessage(err, 'Expense');
     res.json({ error: errorMessage });
   }
 });
 
 router.post('/add', async (req, res) => {
   try {
-    const category = await Category
+    const expense = await Expense
       .create(Object.assign({ UserId: req.user.id }, req.body));
-    res.json(category);
+    res.json(expense);
   } catch (err) {
-    const errorMessage = error.generateMessage(err, 'Category');
+    const errorMessage = error.generateMessage(err, 'Expense');
     res.json({ error: errorMessage });
   }
 });
 
 router.get('/detail/:id', async (req, res) => {
   try {
-    const category = await Category
+    const expense = await Expense
       .findOne({
         where: {
           id: {
@@ -58,10 +58,10 @@ router.get('/detail/:id', async (req, res) => {
           },
         },
       });
-    const message = !category ? { error: 'Category not found.' } : category;
+    const message = !expense ? { error: 'Expense not found.' } : expense;
     res.json(message);
   } catch (err) {
-    const errorMessage = error.generateMessage(err, 'Category');
+    const errorMessage = error.generateMessage(err, 'Expense');
     res.json({ error: errorMessage });
   }
 });
@@ -78,18 +78,19 @@ router.put('/detail/:id', async (req, res) => {
         },
       },
     };
-    await Category.update(req.body, query);
-    const category = await Category.findOne(query);
-    res.json(category);
+    await Expense.update(req.body, query);
+    const expense = await Expense.findOne(query);
+    const message = !expense ? { error: 'Expense not found.' } : expense;
+    res.json(message);
   } catch (err) {
-    const errorMessage = error.generateMessage(err, 'Category');
+    const errorMessage = error.generateMessage(err, 'Expense');
     res.json({ error: errorMessage });
   }
 });
 
 router.delete('/detail/:id', async (req, res) => {
   try {
-    const category = await Category
+    const expense = await Expense
       .destroy({
         where: {
           id: {
@@ -101,13 +102,12 @@ router.delete('/detail/:id', async (req, res) => {
         },
       });
 
-    const message = !category ? 'Category not found.' : 'Successfully deleted';
+    const message = !expense ? 'Expense not found.' : 'Successfully deleted';
     res.json({ error: message });
   } catch (err) {
-    const errorMessage = error.generateMessage(err, 'Category');
+    const errorMessage = error.generateMessage(err, 'Expense');
     res.json({ error: errorMessage });
   }
 });
-
 
 module.exports = router;

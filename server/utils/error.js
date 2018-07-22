@@ -2,18 +2,20 @@ const logger = require('./logs');
 
 const generateMessage = (err, model) => {
   logger.error(err);
-  const type = err.message.split(':').shift();
 
   if (err.name === 'SequelizeUniqueConstraintError') {
     return `${model} already exists.`;
   }
 
-  switch (type) {
+  const type = err.message.split(':');
+  const field = type[1].split(' ')[1].replace(/\./g, ' ');
+
+  switch (type.shift()) {
     case 'notNull Violation':
-      return `${model} is required.`;
+      return `${field} is required.`;
     default:
+      return 'There was a problem with your request.';
   }
-  return err.message;
 };
 
 module.exports = { generateMessage };

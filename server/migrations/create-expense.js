@@ -13,14 +13,13 @@ module.exports = {
       },
       CategoryId: {
         type: Sequelize.INTEGER,
-        onDelete: 'CASCADE',
-        allowNull: false,
         references: {
           model: 'Categories',
           key: 'id',
         },
       },
       date: {
+        allowNull: false,
         type: Sequelize.DATE,
       },
       value: {

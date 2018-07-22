@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
     },
     date: {
+      allowNull: false,
       type: DataTypes.DATE,
     },
     value: {
@@ -28,13 +29,13 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Expense.associate = (models) => {
-    models.Expense.belongsTo(models.User);
-    models.Expense.belongsTo(models.Category, {
+    models.Expense.belongsTo(models.User, {
       onDelete: 'CASCADE',
       foreignKey: {
         allowNull: false,
       },
     });
+    models.Expense.belongsTo(models.Category);
   };
 
   return Expense;
