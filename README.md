@@ -6,6 +6,7 @@
 - `yarn` to install the packages
 - Create an `.env` file at the app's root directory.
 - Specify the following env variables found at .env.default file
+- Create a database local MySQL/MariaDB, see config at `/server/config/db.js`
 - run `yarn dev`
 
 ## Stack
