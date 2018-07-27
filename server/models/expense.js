@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     value: {
       allowNull: false,
+      validate: { min: 0.01 },
       type: DataTypes.DECIMAL,
     },
     createdAt: {
@@ -25,6 +26,14 @@ module.exports = (sequelize, DataTypes) => {
     updatedAt: {
       allowNull: false,
       type: DataTypes.DATE,
+    },
+  }, {
+    validate: {
+      minValue() {
+        if ((this.value < 0.01)) {
+          throw new Error('Minimum value allowed is 0.01.');
+        }
+      },
     },
   });
 
