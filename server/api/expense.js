@@ -36,8 +36,8 @@ router.get('/', async (req, res) => {
 
 router.post('/add', async (req, res) => {
   try {
-    const expense = await Expense
-      .create(Object.assign({ UserId: req.user.id }, req.body));
+    const request = Object.assign({ UserId: req.user.id }, req.body);
+    const expense = await Expense.create(request);
     res.json(expense);
   } catch (err) {
     const errorMessage = error.generateMessage(err, 'Expense');
