@@ -13,6 +13,7 @@ import NProgress from 'nprogress';
 
 import { styleFabBottomRight } from '../lib/utils/shared-styles';
 import { addExpense } from '../lib/api/expense';
+import { getCategories } from '../lib/api/category';
 import notify from '../lib/utils/notifier';
 
 class ExpenseForm extends React.Component {
@@ -21,17 +22,27 @@ class ExpenseForm extends React.Component {
 
     this.state = {
       expense: {},
+      categories: [],
     };
+  }
+
+  async componentDidMount() {
+    try {
+      const categories = await getCategories();
+      this.setState({ categories }); // eslint-disable-line
+    } catch (err) {
+      console.log(err); // eslint-disable-line
+    }
   }
 
   save = async () => {
     NProgress.start();
     try {
       await addExpense(this.state.expense);
-      notify('Saved');
-      NProgress.done();
       const { handleClose } = this.props;
       handleClose();
+      notify('Saved');
+      NProgress.done();
     } catch (err) {
       notify(err);
       NProgress.done();
@@ -73,6 +84,7 @@ class ExpenseForm extends React.Component {
                 fullWidth
                 margin="normal"
                 format="MMM DD, YYYY"
+                disableFuture
                 InputLabelProps={{
                   shrink: true,
                 }}
@@ -112,20 +124,22 @@ class ExpenseForm extends React.Component {
               onChange={(event) => {
                 this.setState({
                   expense: Object.assign({}, this.state.expense, {
-                    category: event.target.value,
+                    CategoryId: event.target.value,
                   }),
                 });
               }}
-              value={this.state.expense.category || ''}
+              value={this.state.expense.CategoryId || ''}
               fullWidth
               margin="normal"
               InputLabelProps={{
                 shrink: true,
               }}
             >
-              <MenuItem>
-                Item
-              </MenuItem>
+              {this.state.categories.map(option => (
+                <MenuItem key={option.id} value={option.id}>
+                  {option.title}
+                </MenuItem>
+              ))}
             </TextField>
           </Grid>
         </Grid>
