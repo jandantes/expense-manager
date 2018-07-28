@@ -33,7 +33,7 @@ class Notifier extends React.Component {
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         message={message}
-        autoHideDuration={5000}
+        autoHideDuration={3000}
         onClose={this.handleSnackbarClose}
         open={this.state.open}
       />
